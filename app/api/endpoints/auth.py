@@ -6,14 +6,17 @@ from app.database.database import get_db
 from app.models.models import User
 from app.utils.jwt_utils import create_jwt_token, verify_jwt_token
 from app.api.models.schemas import UserLogin, UserSignup, UserUpdate
+from passlib.context import CryptContext
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.post("/login")
 async def login(user_data: UserLogin, response: Response, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == user_data.email).first()
     
-    if not user or user.password != user_data.password:
+    if not user or not pwd_context.verify(user_data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
     user_response = {
@@ -42,10 +45,11 @@ async def signup(user_data: UserSignup, response: Response, db: Session = Depend
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    hashed_password = pwd_context.hash(user_data.password)
     new_user = User(
         id=str(uuid.uuid4()),
         email=user_data.email,
-        password=user_data.password,
+        password=hashed_password,
         name=user_data.name,
         phone=user_data.phone,
         country=user_data.country
