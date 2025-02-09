@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.endpoints import ai_doctor, auth, medicine
+from app.api.endpoints import ai_doctor, auth, medicine, medical_conditions
 
 app = FastAPI(
     title="AI Doctor API",
@@ -21,6 +21,7 @@ app.add_middleware(
 app.include_router(ai_doctor.router)
 app.include_router(auth.router)
 app.include_router(medicine.router)
+app.include_router(medical_conditions.router)
 
 if __name__ == "__main__":
     import uvicorn
