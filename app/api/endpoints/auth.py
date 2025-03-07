@@ -32,9 +32,11 @@ async def login(user_data: UserLogin, response: Response, db: Session = Depends(
         key="session",
         value=token,
         httponly=True,
-        secure=False,
+        secure=True,
         samesite="lax",
-        max_age=31536000
+        max_age=31536000,
+        domain="symvii.com",
+        path="/"
     )
     
     return {"user": user_response}
@@ -74,7 +76,9 @@ async def signup(user_data: UserSignup, response: Response, db: Session = Depend
         httponly=True,
         secure=True,
         samesite="lax",
-        max_age=31536000
+        max_age=31536000,
+        domain="symvii.com",
+        path="/"
     )
     
     return {"user": user_response}
